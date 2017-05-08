@@ -45,12 +45,12 @@ void *mock_endpoint(int *client_fd_ptr) {
     char client_message[MESSAGE_SIZE];
     client_fd = *(int *) client_fd_ptr;
     
-    recv(client_fd , client_message , MESSAGE_SIZE - 1 , MSG_PEEK);
+    recv(client_fd, client_message, MESSAGE_SIZE - 1, MSG_PEEK);
     
     // Mock time consuming job
     time_consuming_job();
     
-    send(client_fd, "HTTP/1.1 200\r\n\r\nOK\r\n", strlen("HTTP/1.1 200\r\n\r\nOK\r\n"), MSG_OOB);
+    write(client_fd, "HTTP/1.1 200\r\n\r\nOK\r\n", strlen("HTTP/1.1 200\r\n\r\nOK\r\n"));
     close(client_fd);
     
     return NULL;
@@ -73,8 +73,6 @@ int main(int argc, const char * argv[]) {
         exit_with_message("Could not create socket!");
     }
     put_log("Socket has been created.");
-    
-    setsockopt(listen_fd, SOL_SOCKET, SO_RCVBUF, 2048, (int)(sizeof(int)));
     
     // Prepare server
     server.sin_family      = AF_INET;
